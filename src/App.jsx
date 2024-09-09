@@ -1,9 +1,12 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { NavLink, Route, Routes } from "react-router-dom";
 import clsx from "clsx";
 
 import css from "./App.module.css";
 import Loader from "./components/Loader/Loader";
+import { useDispatch, useSelector } from "react-redux";
+import { selectAuthIsLoggedIn, selectAuthIsRefreshing, selectAuthUser } from "./redux/auth/selectors";
+import { apiRefreshUser } from "./redux/auth/operations";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const ContactsPage = lazy(() => import("./pages/ContactsPage"));
@@ -12,12 +15,22 @@ const RegisterPage = lazy(() => import("./pages/RegisterPage"));
 const PostsPage = lazy(() => import("./pages/PostsPage"));
 const ContextExamplePage = lazy(() => import("./pages/ContextExamplePage"));
 const PostDetailsPage = lazy(() => import("./pages/PostDetailsPage"));
-const PostComments = lazy(() =>
-  import("./components/PostComments/PostComments")
+const PostComments = lazy(() => import("./components/PostComments/PostComments")
 );
 const PostReviews = lazy(() => import("./components/PostReviews/PostReviews"));
 
 function App() {
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector(selectAuthIsLoggedIn);
+  const isRefreshing = useSelector(selectAuthIsRefreshing);
+  const user = useSelector(selectAuthUser);
+  
+  useEffect(() => {
+    dispatch(apiRefreshUser());
+  }, [dispatch]);
+
+  if (isRefreshing) return <p>User is refreshing, please wait</p>;
+
   return (
     <div>
     <header>

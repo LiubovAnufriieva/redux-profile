@@ -1,41 +1,33 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 
 import Loader from "../components/Loader/Loader";
 import SearchPostsForm from "../components/SearchPostsForm/SearchPostsForm";
+import { useDispatch, useSelector } from "react-redux";
+import { selectPosts, selectPostsError, selectPostsIsLoading } from "../redux/posts/posts.selectors";
+import { apiGetPosts, apiGetPostsByQuery } from "../redux/posts/posts.operations";
 
-import { requestAllPosts, requestPostsBySearchValue } from "../services/api";
 
 const PostsPage = () => {
-  const [posts, setPosts] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null); 
-  const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
+const dispatch = useDispatch();
+
+  const posts = useSelector(selectPosts)
+  const isLoading = useSelector(selectPostsIsLoading);
+  const error = useSelector(selectPostsError) 
+  const [searchParams, setSearchParams] = useSearchParams();
+
   console.log(location);
 
   const query = searchParams.get("query");
 
   useEffect(() => {
-    const fetchPostsBySearchValue = async () => {
-      try {
-        setIsLoading(true);
         if (query) {
-          const data = await requestPostsBySearchValue(query);
-          setPosts(data.posts);
+          dispatch(apiGetPostsByQuery(query));
         } else {
-          const data = await requestAllPosts();
-          setPosts(data.posts);
+          dispatch(apiGetPosts());
         }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPostsBySearchValue();
-  }, [query]);
+      }, [query, dispatch]);
 
   const onSearch = (searchTerm) => {
     setSearchParams({

@@ -14,7 +14,7 @@ import storage from "redux-persist/lib/storage";
 
 import { profilesReducer } from "./profiles/profilesReducer";
 import { filterReducer } from "./filter/filterReducer";
-import { postsReducer } from "../posts/posts.slice";
+import { postsReducer } from "./posts/posts.slice";
 import { authReducer } from "../redux/auth/slice";
 
 const authConfig = {
